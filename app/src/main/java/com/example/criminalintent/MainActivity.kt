@@ -8,15 +8,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-
-
+      var currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+//
+//
             supportFragmentManager
                 .beginTransaction()
                 .add(R.id.fragment_container,CrimeListFragment.newInstance())
                 .commit()
 
+//
+//
+//        if(currentFragment == null){
+//            var fragment = CrimeListFragment.newInstance()
+//            supportFragmentManager
+//                .beginTransaction()
+//                .add(R.id.fragment_container,fragment)
+//                .commit()
+//        }
 
-
-    }
+   }
 }

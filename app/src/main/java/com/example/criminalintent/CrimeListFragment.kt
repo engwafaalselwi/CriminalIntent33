@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,10 +20,7 @@ import java.util.zip.Inflater
 
 class CrimeListFragment : Fragment () {
     private lateinit var crimeRecyclerView: RecyclerView
-
-
-
-    private var adpter :CrimeAdpter ?=null
+    private var adapter :CrimeAdpter ?=CrimeAdpter(emptyList())
 
     private val crimeListViewModel :CrimeListViewModel by lazy {
         ViewModelProviders.of(this).get(CrimeListViewModel::class.java)
@@ -48,18 +46,31 @@ class CrimeListFragment : Fragment () {
         var view = inflater.inflate(R.layout.fragment_crime_list,container,false)
         crimeRecyclerView = view.findViewById(R.id.crime_recycler_view)
         crimeRecyclerView.layoutManager = LinearLayoutManager(context)
-            udateUI()
-
-
+        crimeRecyclerView.adapter = adapter
+           // udateUI()
         return view
        // return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    fun udateUI(){
-        adpter = CrimeAdpter(crimeListViewModel.crimes)
-        crimeRecyclerView.adapter = adpter
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        crimeListViewModel.crimeListLiveData.observe(
+            viewLifecycleOwner,
+            Observer { crimes ->
+                crimes?.let {
+                    updateUI(crimes)
+                }
+            })
+    }
+
+   private fun updateUI(crimes: List<Crime>){
+        adapter =CrimeAdpter(crimes)
+        crimeRecyclerView.adapter = adapter
+       //adpter = CrimeAdpter(crimeListViewModel.crimes)
+
 
     }
+
 
     private inner class CrimeViewHolder (view :View) :RecyclerView.ViewHolder(view),View.OnClickListener{
         val titleTextView: TextView = itemView.findViewById(R.id.crime_title)
@@ -84,8 +95,9 @@ class CrimeListFragment : Fragment () {
                 } else {
                     View.GONE
 
+
             }
-         
+
         }
 
         override fun onClick(v: View) {
@@ -117,7 +129,7 @@ class CrimeListFragment : Fragment () {
         }
 
         override fun getItemViewType(position: Int): Int {
-           when(crimes[position].requiresPolice){
+           when(crimes[position].isSolved==true){
                true->return@getItemViewType 1
                else->return@getItemViewType 0
            }
